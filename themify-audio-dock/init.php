@@ -2,7 +2,7 @@
 /*
 Plugin Name:  Themify Audio Dock
 Plugin URI:   https://themify.me/
-Version:      2.0.4 
+Version:      2.0.5
 Author:       Themify
 Author URI:   https://themify.me
 Description:  An slick and simple sticky music player.
@@ -43,7 +43,7 @@ class Themify_Player {
 
 	
 	public static function get_version(){
-		return '2.0.4';
+		return '2.0.5';
 	}
 
 	public function i18n() {
@@ -186,14 +186,14 @@ class Themify_Player {
 		if( 'video' === $this->type ):
 			$html .= sprintf( '<video controls="controls" preload="none" width="%s" height="%s"></video>',
 				$atts['style'],
-				$atts['width'],
-				$atts['height']
+				intval( $atts['width'] ),
+				intval( $atts['height'] )
 			);
 		// Audio player:
 		else:
 			$html .= sprintf(
 	            '<audio controls="controls" preload="%s"></audio>',
-	            $atts['preload']
+	            esc_attr( $atts['preload'] )
 			);
 		endif;
 
