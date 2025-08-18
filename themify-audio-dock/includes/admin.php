@@ -45,10 +45,34 @@ class Themify_Player_Admin {
 	 * Register and add settings
 	 */
 	public function admin_init() {        
-		register_setting( 'themify_audio_dock_option_group', 'themify_audio_dock_playlist' );
-		register_setting( 'themify_audio_dock_option_group', 'themify_audio_dock_collapsed' );
-		register_setting( 'themify_audio_dock_option_group', 'themify_audio_dock_bar_color' );
-		register_setting( 'themify_audio_dock_option_group', 'themify_audio_dock_track_color' );
+		register_setting(
+			'themify_audio_dock_option_group',
+			'themify_audio_dock_playlist',
+			array(
+				'sanitize_callback' => array( $this, 'sanitize_playlist' )
+			)
+		);
+		register_setting(
+			'themify_audio_dock_option_group',
+			'themify_audio_dock_collapsed',
+			array(
+				'sanitize_callback' => array( $this, 'sanitize_collapsed' )
+			)
+		);
+		register_setting(
+			'themify_audio_dock_option_group',
+			'themify_audio_dock_bar_color',
+			array(
+				'sanitize_callback' => array( $this, 'sanitize_color' )
+			)
+		);
+		register_setting(
+			'themify_audio_dock_option_group',
+			'themify_audio_dock_track_color',
+			array(
+				'sanitize_callback' => array( $this, 'sanitize_color' )
+			)
+		);
 
 		add_settings_section(
 			'themify_audio_dock_playlist_settings',
@@ -120,8 +144,8 @@ class Themify_Player_Admin {
 
 		foreach( $playlist as $key => $track ) {
 			echo '<div class="themify-track">';
-			printf( '<label>%s <input class="widefat" type="text" name="themify_audio_dock_playlist[%s][name]" value="%s"></label>', __( 'Name', 'themify-audio-dock' ), $key, $track['name'] );
-			printf( '<label>%s <input class="widefat song-file-field" type="text" name="themify_audio_dock_playlist[%s][file]" value="%s"></label>', __( 'Song File', 'themify-audio-dock' ), $key, $track['file'] );
+			printf( '<label>%s <input class="widefat" type="text" name="themify_audio_dock_playlist[%s][name]" value="%s"></label>', __( 'Name', 'themify-audio-dock' ), $key, esc_attr($track['name']) );
+			printf( '<label>%s <input class="widefat song-file-field" type="text" name="themify_audio_dock_playlist[%s][file]" value="%s"></label>', __( 'Song File', 'themify-audio-dock' ), $key, esc_attr($track['file']) );
 			echo '<a href="#" class="themify-audio-dock-media-browse" data-uploader-title="' . __( 'Browse Audio', 'themify-audio-dock' ) . '" data-uploader-button-text="' . __( 'Insert Audio', 'themify-audio-dock' ) . '" data-type="audio">' . __( 'Browse Library', 'themify-audio-dock' ) . '</a>';
 			echo '<a href="#" class="themify-audio-dock-delete-track">X</a>';
 			echo '</div>';
@@ -148,6 +172,43 @@ class Themify_Player_Admin {
 		wp_enqueue_style( 'audiodock-colorpicker', $url . 'assets/jquery.minicolors.css',null,$v );
 		wp_enqueue_style( 'themify-player-admin', $url . 'assets/admin.css', array( 'audiodock-colorpicker' ),$v);
 		wp_enqueue_script( 'themify-player-admin', $url . 'assets/admin.js', array( 'jquery', 'audiodock-colorpicker' ),$v,true );
+	}
+
+	public function sanitize_playlist( $playlist ) {
+		if ( ! is_array( $playlist ) ) {
+			return array();
+		}
+		foreach ( $playlist as $key => $track ) {
+			$playlist[$key]['name'] = sanitize_text_field( $track['name'] );
+			$playlist[$key]['file'] = esc_url_raw( $track['file'] );
+		}
+		return $playlist;
+	}
+
+	public function sanitize_collapsed( $value ) {
+		return in_array( $value, array( 'yes', 'no' ), true ) ? $value : 'no';
+	}
+
+	public function sanitize_color($color)
+	{
+		// Accept valid hex (#fff, #ffffff) or rgba(r,g,b,a) format
+		$color = trim($color);
+		if (preg_match('/^#([A-Fa-f0-9]{3}){1,2}$/', $color)) {
+			return $color;
+		}
+		if (preg_match('/^rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(0|1|0?\.\d+)\s*\)$/', $color)) {
+			// Validate each channel
+			$parts = [];
+			preg_match('/^rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(0|1|0?\.\d+)\s*\)$/', $color, $parts);
+			$r = (int)$parts[1];
+			$g = (int)$parts[2];
+			$b = (int)$parts[3];
+			$a = (float)$parts[4];
+			if ($r >= 0 && $r <= 255 && $g >= 0 && $g <= 255 && $b >= 0 && $b <= 255 && $a >= 0 && $a <= 1) {
+				return "rgba($r,$g,$b,$a)";
+			}
+		}
+		return '';
 	}
 }
 new Themify_Player_Admin;

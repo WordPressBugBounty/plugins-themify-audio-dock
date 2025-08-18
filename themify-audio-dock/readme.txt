@@ -3,8 +3,8 @@ Contributors: themifyme
 Plugin Name: Themify Audio Dock
 Tags: audio, audio-player, playlist
 Requires at least: 4.3
-Tested up to: 6.6.0
-Stable tag: 2.0.5
+Tested up to: 6.8.2
+Stable tag: 2.0.6
 License: GPL v2
 License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 

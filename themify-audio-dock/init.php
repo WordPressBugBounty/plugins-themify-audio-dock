@@ -2,7 +2,7 @@
 /*
 Plugin Name:  Themify Audio Dock
 Plugin URI:   https://themify.me/
-Version:      2.0.5
+Version:      2.0.6 
 Author:       Themify
 Author URI:   https://themify.me
 Description:  An slick and simple sticky music player.
@@ -43,7 +43,7 @@ class Themify_Player {
 
 	
 	public static function get_version(){
-		return '2.0.5';
+		return '2.0.6';
 	}
 
 	public function i18n() {
